@@ -1,0 +1,560 @@
+
+
+
+Activity Streams Working Group                                  J. Snell
+                                                                     IBM
+                                                             May 9, 2012
+
+
+                 Verb Definitions for Activity Streams
+
+Abstract
+
+   TBD
+
+
+Table of Contents
+
+   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . . . 2
+   2.  The "verb" Object Type  . . . . . . . . . . . . . . . . . . . . 2
+     2.1.  Object Combinations . . . . . . . . . . . . . . . . . . . . 2
+     2.2.  Templates . . . . . . . . . . . . . . . . . . . . . . . . . 5
+     2.3.  A Complete Example  . . . . . . . . . . . . . . . . . . . . 7
+     2.4.  Verb Collections  . . . . . . . . . . . . . . . . . . . . . 7
+   3.  Security Considerations . . . . . . . . . . . . . . . . . . . . 8
+   4.  License . . . . . . . . . . . . . . . . . . . . . . . . . . . . 8
+   5.  Normative References  . . . . . . . . . . . . . . . . . . . . . 9
+   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . . . 9
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Snell                                                           [Page 1]
+
+                            Verb Definitions                    May 2012
+
+
+1.  Introduction
+
+   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+   "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
+   document are to be interpreted as described in [RFC2119].
+
+
+2.  The "verb" Object Type
+
+   The "verb" object is a special type Activity Streams Object used to
+   describe verbs that can be used within the Activity Streams format.
+
+   At a minimum, "verb" objects consist of the following properties:
+
+   +-------------+---------------+-------------------------------------+
+   | Name        | Type          | Description                         |
+   +-------------+---------------+-------------------------------------+
+   | displayName | String        | A natural-language, human-readable  |
+   |             |               | and plain-text display name for the |
+   |             |               | verb.                               |
+   | hypernyms   | Array of      | An array of zero or more other      |
+   |             | Strings       | known verbs for which this verb can |
+   |             |               | be considered a hyponym.            |
+   | id          | String        | The unique identifier for the verb  |
+   |             |               | object.                             |
+   | objects     | Array of      | An array of Object Combinations     |
+   |             | Object        | that generally describes the most   |
+   |             | Combinations  | common combinations of actor,       |
+   |             | (Section 2.1) | object and target object types      |
+   |             |               | expected to be used with this verb. |
+   |             |               | Object combinations are discussed   |
+   |             |               | in detail within Section 2.1.       |
+   | synonyms    | Array of      | An array of zero or more other      |
+   |             | Strings       | known verbs for which this verb can |
+   |             |               | be considered to be a synonym or    |
+   |             |               | alias.                              |
+   | value       | String        | The specific String that is to be   |
+   |             |               | used for the "verb" property within |
+   |             |               | an Activity object.                 |
+   +-------------+---------------+-------------------------------------+
+
+2.1.  Object Combinations
+
+   An "Object Combination" a description of what types of actor, object
+   and target objects are typically expected to be used with a
+   particular verb.  Each possible combination is represented as
+   distinct objects that consist of the following properties:
+
+
+
+
+Snell                                                           [Page 2]
+
+                            Verb Definitions                    May 2012
+
+
+   +----------------+---------------+----------------------------------+
+   | Name           | Type          | Description                      |
+   +----------------+---------------+----------------------------------+
+   | actor          | String        | A specific actor objectType or   |
+   |                |               | the literal character "*" to     |
+   |                |               | indicate any objectType.         |
+   | object         | String        | A specific object objectType or  |
+   |                |               | the literal character "*" to     |
+   |                |               | indicate any objectType.         |
+   | target         | String        | A specific target objectType or  |
+   |                |               | the literal character "*" to     |
+   |                |               | indicate any objectType.  If the |
+   |                |               | target property is not specified |
+   |                |               | as part of the combination, the  |
+   |                |               | assumption is that no target     |
+   |                |               | property is expected to be       |
+   |                |               | significant within activities    |
+   |                |               | that utilize this combination of |
+   |                |               | object types.                    |
+   | targetRequired | Boolean       | A boolean that indicates whether |
+   |                |               | a target property is considered  |
+   |                |               | to be a required for this object |
+   |                |               | type combination.  If not        |
+   |                |               | specified, the value is assumed  |
+   |                |               | to be false, indicating that the |
+   |                |               | target object is optional.       |
+   | templates      | Templates     | An object that generally         |
+   |                | Object        | describes how instances of       |
+   |                | (Section 2.2) | activities using this Object     |
+   |                |               | Combination can be expressed in  |
+   |                |               | human-readable language.         |
+   |                |               | Templates are discussed in       |
+   |                |               | detail within Section 2.2.       |
+   +----------------+---------------+----------------------------------+
+
+   For instance, to indicate that a verb is typically associated with
+   "person" actors, "note" objects and any kind of target, the Object
+   Combination representation would be:
+
+     {
+       "actor": "person",
+       "object": "note",
+       "target": "*",
+       "targetRequired": true,
+       "templates": {...}
+     }
+
+   The value of the "objects" property on the "verb" object consists of
+
+
+
+Snell                                                           [Page 3]
+
+                            Verb Definitions                    May 2012
+
+
+   zero or more Object Combinations within a JSON Array:
+
+     {
+       "objectType": "verb",
+       "id": "http://example.org/foo/verb",
+       "value": "http://example.org/foo/verb",
+       ...,
+       "objects": [
+         {
+           "actor": "person",
+           "object": "note",
+           "target": "*",
+           "targetRequired": true,
+           "templates": { ... }
+         },
+         {
+           "actor": "person",
+           "object": "comment",
+           "target": "*",
+           "templates": { ... }
+         }
+       ]
+     }
+
+   Note that, to avoid possible ambiguity in a verb's definition, when
+   multiple overlapping object combinations are specified, the most
+   specific combination matching the actual instance of an activity will
+   take precedence.  For example, given the following set of
+   combinations:
+
+    {
+       ...,
+       "objects": [
+         {
+           "actor": "person",
+           "object": "*",
+           "target": "*",
+           "targetRequired": false
+         },
+         {
+           "actor": "person",
+           "object": "comment",
+           "target": "service",
+           "targetRequired": true
+         }
+       ]
+     }
+
+
+
+
+Snell                                                           [Page 4]
+
+                            Verb Definitions                    May 2012
+
+
+   When an activity using the verb specifies an "actor" objectType of
+   "person", an "object" objectType of "comment" and a "target"
+   objectType of "service", the second Object Combination will be
+   considered to apply.  For all other combinations using an "actor"
+   objectType of "person", the first Object Combination will be
+   considered to apply.
+
+   Note that Object Combinations are considered to be informative in
+   nature only and do not represent every possible combination of object
+   types for which the verb can be used.  The sole intent of describing
+   Object Combinations is to communicate information about how the
+   described verb was originally intended to be used.
+
+2.2.  Templates
+
+   Activity Objects are intended to provide a machine-readable
+   representation of an event that has occurred.  Often, however,
+   systems require the ability to generate human-readable, localized
+   descriptions of Activities.  When working with a finite set of known
+   verbs and objects with well defined semantics, generating such
+   statements is relatively straightforward.  However, because the
+   Activity Streams format allows verbs and objectTypes to be extended
+   in a completely decentralized manner, it becomes difficult for
+   implementations to generate appopriate readable descriptions of all
+   types of activities.
+
+   To address this, "verb" objects can provide a collection of template
+   strings organized both by Object Combination and Language that can be
+   processed to generate appropriately localized and generally readable
+   descriptive statements about the activity.
+
+   Templates are expressed within a JSON Object whose property names are
+   Language Ranges [RFC4647] and whose values are Strings of characters
+   consisting of a mixture of localized literal values and specific
+   replacement tokens wrapped in ASCII curly bracket characters ("{" and
+   "}").
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Snell                                                           [Page 5]
+
+                            Verb Definitions                    May 2012
+
+
+   For example:
+
+     {
+       "actor": "person",
+       "object": "note",
+       "target": "*",
+       "targetRequired": true,
+       "templates": {
+         "*": "{actor} sent {object} to {target}",
+         "de-*": "{actor} geschickt {target} das {object}",
+       }
+     }
+
+   Implementations select an appropriate template to use by matching the
+   Language Ranges provided to the appropriate target language for which
+   the readable statement is to be generated.  If multiple matching
+   Language Ranges are provided, the most specific Range and associated
+   template is selected.
+
+   An implementation processing a template would replace each of the
+   specific replacement tokens with a value adequately representing the
+   referenced object.  Typically, given no additional information about
+   the object type in question, implementations SHOULD use the value of
+   the "displayName" property, if present.  The specific replacement
+   tokens defined by this version of the specification are:
+
+   +----------+--------------------------------------------------------+
+   | Token    | Description                                            |
+   +----------+--------------------------------------------------------+
+   | {actor}  | Replaced with a String value that describes the actor  |
+   |          | object specified within the Activity.                  |
+   | {object} | Replaced with a String value that describes the object |
+   |          | specified within the Activity.                         |
+   | {target} | Replaced with a String value that describes the target |
+   |          | specified within the Activity.  If a target object is  |
+   |          | not specified within the activity, the {target} token  |
+   |          | MUST be ignored and left unreplaced in the final       |
+   |          | generated String value.                                |
+   +----------+--------------------------------------------------------+
+
+   Implementations are free to introduce additional replacement tokens
+   so long as the label for each is an absolute URI reference.  When an
+   implementation encounters a template that uses a replacement token
+   that it is unable to understand or replace with an appropriate value,
+   the token SHOULD be ignored and left unreplaced in the final
+   generated String value.
+
+   Replacement tokens MUST NOT be processed recursively.
+
+
+
+Snell                                                           [Page 6]
+
+                            Verb Definitions                    May 2012
+
+
+   The Strings generated by a template MUST be considered to be plain
+   text and SHOULD NOT contain markup of any kind.
+
+   If any given verb is known to be a hyponym or synonym of another verb
+   for which a "verb" object definition is available, implementations
+   MAY choose to utilize any templates defined within the definitions of
+   those hypernyms and synonyms.
+
+2.3.  A Complete Example
+
+   The following illustrates a complete example of a "verb" object
+   definition:
+
+     {
+       "objectType": "verb",
+       "displayName": "Send",
+       "id": "http://example.org/verbs/send",
+       "value": "http://example.org/verbs/send",
+       "synonyms": ["http://example.org/verbs/deliver"],
+       "hypernyms": ["give"],
+       "objects": [
+         {
+           "actor": "person",
+           "object": "note",
+           "target": "person",
+           "targetRequired": true,
+           "templates": {
+             "*": "{actor} sent {object} to {target}",
+             "de-*": "{actor} geschickt {target} das {object}",
+           }
+         },
+         {
+           "actor": "person",
+           "object": "note",
+           "templates": {
+             "*": "{actor} sent {object}",
+             "de-*": "{actor} geschickt {object}",
+           }
+         },
+
+       ]
+     }
+
+2.4.  Verb Collections
+
+   Collections of "verb" object definitions can be represented using the
+   basic Activity Streams Collection serialization defined in Section
+   3.5 of The JSON Activity Streams specification.
+
+
+
+Snell                                                           [Page 7]
+
+                            Verb Definitions                    May 2012
+
+
+   For example:
+
+     {
+       "totalItems": 2,
+       "items": [
+         {"objectType": "verb", ...},
+         {"objectType": "verb", ...}
+       ]
+     }
+
+   When an individual "verb" object is considered to be part of a larger
+   collection of verbs, it can include a special extension property
+   named "$collection" whose value is the absolute IRI of a JSON
+   document containing the full collection of verbs.  This follows the
+   conventions and requirements specified by the Links for Activity
+   Streams specification. [links]
+
+   Likewise, the special extension property "$self" can be used to
+   specify the absolute IRI of a JSON document containing only the verb
+   definition.
+
+   For example:
+
+     {
+       "objectType": "verb",
+       "$collection": "http://example.org/verbs/all",
+       "$self": "http://example.org/verbs/send",
+       "displayName": "Send",
+       "id": "http://example.org/verbs/send",
+       "value": "http://example.org/verbs/send",
+       "synonyms": ["http://example.org/verbs/deliver"],
+       "hypernyms": ["give"],
+       "objects": [ ... ]
+     }
+
+
+3.  Security Considerations
+
+   There are no additional security considerations introduced by this
+   specification.
+
+
+4.  License
+
+   This Specification is made available under the Open Web Foundation
+   Agreement Version 1.0, which is available at
+   http://www.openwebfoundation.org/legal/.
+
+
+
+
+Snell                                                           [Page 8]
+
+                            Verb Definitions                    May 2012
+
+
+   You can review the signed copies of the Open Web Foundation Agreement
+   Version 1.0 for this Specification at
+   http://activitystrea.ms/licensing/, which may also include additional
+   parties to the authors.
+
+   Your use of this Specification may be subject to other third party
+   rights.  THIS SPECIFICATION IS PROVIDED "AS IS."  The contributors
+   expressly disclaim any warranties (express, implied, or otherwise),
+   including implied warranties of merchantability, non-infringement,
+   fitness for a particular purpose, or title, related to the
+   Specification.  The entire risk as to implementing or otherwise using
+   the Specification is assumed by the Specification implementer and
+   user.  IN NO EVENT WILL ANY PARTY BE LIABLE TO ANY OTHER PARTY FOR
+   LOST PROFITS OR ANY FORM OF INDIRECT, SPECIAL, INCIDENTAL, OR
+   CONSEQUENTIAL DAMAGES OF ANY CHARACTER FROM ANY CAUSES OF ACTION OF
+   ANY KIND WITH RESPECT TO THIS SPECIFICATION OR ITS GOVERNING
+   AGREEMENT, WHETHER BASED ON BREACH OF CONTRACT, TORT (INCLUDING
+   NEGLIGENCE), OR OTHERWISE, AND WHETHER OR NOT THE OTHER PARTY HAS
+   BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+
+5.  Normative References
+
+   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+              Requirement Levels", BCP 14, RFC 2119, March 1997.
+
+   [RFC3986]  Berners-Lee, T., Fielding, R., and L. Masinter, "Uniform
+              Resource Identifier (URI): Generic Syntax", STD 66,
+              RFC 3986, January 2005.
+
+   [RFC3987]  Duerst, M. and M. Suignard, "Internationalized Resource
+              Identifiers (IRIs)", RFC 3987, January 2005.
+
+   [RFC4647]  Phillips, A. and M. Davis, "Matching of Language Tags",
+              BCP 47, RFC 4647, September 2006.
+
+   [activitystreams]
+              Snell, J., Atkins, M., Norris, W., Messina, C., Wilkinson,
+              M., and R. Dolin, "JSON Activity Streams 1.0", May 2011.
+
+   [links]    Snell, J., "Links for Activity Streams", April 2012.
+
+
+
+
+
+
+
+
+
+
+Snell                                                           [Page 9]
+
+                            Verb Definitions                    May 2012
+
+
+Author's Address
+
+   James M Snell
+   IBM
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Snell                                                          [Page 10]
+

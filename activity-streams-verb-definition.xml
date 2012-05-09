@@ -1,0 +1,470 @@
+<?xml version="1.0" encoding="US-ASCII"?>
+<?xml-stylesheet type='text/xsl' href='./rfc2629.xslt' ?>
+<!DOCTYPE rfc SYSTEM "rfc2629.dtd" [
+  <!ENTITY rfc2119 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.2119.xml'> 
+  <!ENTITY rfc3987 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.3987.xml'>
+  <!ENTITY rfc3986 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.3986.xml'>
+  <!ENTITY rfc4647 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.4647.xml'>
+  <!ENTITY astreams PUBLIC '' 'http://docs.opensocial.org/download/attachments/4358254/astreams.xml'>
+]>
+<?rfc toc="yes"?>
+<?rfc tocompact="yes"?>
+<?rfc tocdepth="3"?>
+<?rfc tocindent="yes"?>
+<?rfc symrefs="yes"?>
+<?rfc sortrefs="yes"?>
+<?rfc comments="yes"?>
+<?rfc inline="yes"?>
+<?rfc compact="yes"?>
+<?rfc subcompact="no"?>
+<?rfc private="Activity Streams Working Group"?>
+<rfc>
+  <front>
+    <title abbrev="Verb Definitions">Verb Definitions for Activity Streams</title>
+
+    <author fullname="James M Snell" initials="J.M." surname="Snell">
+      <organization>IBM</organization>
+    </author>
+
+    <date month="May" year="2012" />
+
+    <abstract>
+      <t>TBD</t>
+    </abstract>
+
+  </front>
+
+  <middle>
+
+    <section title="Introduction">
+   
+      <t>The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+      "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
+      document are to be interpreted as described in <xref
+      target="RFC2119" />.</t>
+      
+    </section>
+
+    <section title="The &quot;verb&quot; Object Type" anchor="verb">
+    
+      <t>The "verb" object is a special type Activity Streams Object used
+      to describe verbs that can be used within the Activity 
+      Streams format.</t>
+      
+      <t>At a minimum, "verb" objects consist of the following properties:</t>
+      
+      <texttable>
+        <ttcol>Name</ttcol>
+        <ttcol>Type</ttcol>
+        <ttcol>Description</ttcol>
+        
+        <c>displayName</c>
+        <c>String</c>
+        <c>A natural-language, human-readable and plain-text display name 
+        for the verb.</c>
+        
+        <c>hypernyms</c>
+        <c>Array of Strings</c>
+        <c>An array of zero or more other known verbs for which this verb can 
+        be considered a hyponym.</c>
+        
+        <c>id</c>
+        <c>String</c>
+        <c>The unique identifier for the verb object.</c>
+        
+        <c>objects</c>
+        <c>Array of <xref target="objects">Object Combinations</xref></c>
+        <c>An array of Object Combinations that generally describes the most 
+        common combinations of actor, object and target object types expected 
+        to be used with this verb.  Object combinations are discussed in detail 
+        within <xref target="objects"/>.</c>
+        
+        <c>synonyms</c>
+        <c>Array of Strings</c>
+        <c>An array of zero or more other known verbs for which this verb can
+        be considered to be a synonym or alias.</c>
+        
+        <c>value</c>
+        <c>String</c>
+        <c>The specific String that is to be used for the <spanx style="verb">verb</spanx> 
+        property within an Activity object.</c>
+        
+      </texttable>
+      
+      <section title="Object Combinations" anchor="objects">
+      
+        <t>An "Object Combination" a description of what types of actor,
+        object and target objects are typically expected to be used with a 
+        particular verb. Each possible combination is represented as distinct
+        objects that consist of the following properties:</t>
+        
+        <texttable>
+          <ttcol>Name</ttcol>
+          <ttcol>Type</ttcol>
+          <ttcol>Description</ttcol>
+          <c>actor</c>
+          <c>String</c>
+          <c>A specific actor objectType or the literal character "*" to 
+          indicate any objectType.</c>
+          <c>object</c>
+          <c>String</c>
+          <c>A specific object objectType or the literal character "*" to
+          indicate any objectType.</c>
+          <c>target</c>
+          <c>String</c>
+          <c>A specific target objectType or the literal character "*" to
+          indicate any objectType. If the target property is not specified
+          as part of the combination, the assumption is that no target property
+          is expected to be significant within activities that utilize this
+          combination of object types.</c>
+          <c>targetRequired</c>
+          <c>Boolean</c>
+          <c>A boolean that indicates whether a target property is considered
+          to be a required for this object type combination. If not specified,
+          the value is assumed to be false, indicating that the target object
+          is optional.</c>        
+          <c>templates</c>
+          <c><xref target="templates">Templates Object</xref></c>
+          <c>An object that generally describes how instances of activities 
+          using this Object Combination can be expressed in human-readable 
+          language. Templates are discussed in detail within 
+          <xref target="templates"/>.</c>
+        </texttable>
+        
+        <figure><preamble>For instance, to indicate that a verb is typically
+        associated with "person" actors, "note" objects and any kind of target,
+        the Object Combination representation would be:</preamble><artwork>
+  {
+    "actor": "person",
+    "object": "note",
+    "target": "*",
+    "targetRequired": true,
+    "templates": {...}
+  }
+        </artwork></figure>
+              
+        <t>The value of the <spanx style="verb">objects</spanx> property on 
+        the "verb" object consists of zero or more Object Combinations 
+        within a JSON Array:</t>
+        
+        <figure><artwork>
+  {
+    "objectType": "verb",
+    "id": "http://example.org/foo/verb",
+    "value": "http://example.org/foo/verb",
+    ...,
+    "objects": [
+      {
+        "actor": "person",
+        "object": "note",
+        "target": "*",
+        "targetRequired": true,
+        "templates": { ... }
+      },
+      {
+        "actor": "person",
+        "object": "comment",
+        "target": "*",
+        "templates": { ... }
+      }
+    ]
+  }
+        </artwork></figure>
+        
+        <t>Note that, to avoid possible ambiguity in a verb's definition, 
+        when multiple overlapping object combinations are specified, the 
+        most specific combination matching the actual instance of an activity 
+        will take precedence. For example, given the following set of 
+        combinations:</t>
+        
+        <figure><artwork>
+ {
+    ...,
+    "objects": [
+      {
+        "actor": "person",
+        "object": "*",
+        "target": "*",
+        "targetRequired": false
+      },
+      {
+        "actor": "person",
+        "object": "comment",
+        "target": "service",
+        "targetRequired": true
+      }
+    ]
+  }
+        </artwork></figure>
+        
+        <t>When an activity using the verb specifies an "actor" objectType of 
+        "person", an "object" objectType of "comment" and a "target" objectType
+        of "service", the second Object Combination will be considered to apply.
+        For all other combinations using an "actor" objectType of "person", 
+        the first Object Combination will be considered to apply.</t>
+        
+        <t>Note that Object Combinations are considered to be informative in 
+        nature only and do not represent every possible combination of object 
+        types for which the verb can be used. The sole intent of describing 
+        Object Combinations is to communicate information about how the described
+        verb was originally intended to be used.</t>
+       
+      </section>
+    
+      <section title="Templates" anchor="templates">
+      
+        <t>Activity Objects are intended to provide a machine-readable 
+        representation of an event that has occurred. Often, however, 
+        systems require the ability to generate human-readable, localized
+        descriptions of Activities. When working with a finite set of 
+        known verbs and objects with well defined semantics, generating 
+        such statements is relatively straightforward. However, because
+        the Activity Streams format allows verbs and objectTypes to be 
+        extended in a completely decentralized manner, it becomes difficult
+        for implementations to generate appopriate readable descriptions
+        of all types of activities.</t>
+        
+        <t>To address this, "verb" objects can provide a collection of 
+        template strings organized both by Object Combination and Language
+        that can be processed to generate appropriately localized and generally
+        readable descriptive statements about the activity.</t>
+        
+        <t>Templates are expressed within a JSON Object whose property names
+        are <xref target="RFC4647">Language Ranges</xref> and whose values are
+        Strings of characters consisting of a mixture of localized literal 
+        values and specific replacement tokens wrapped in ASCII curly bracket
+        characters ("{" and "}").</t>
+        
+        <figure><preamble>For example:</preamble><artwork>
+  {
+    "actor": "person",
+    "object": "note",
+    "target": "*",
+    "targetRequired": true,
+    "templates": {
+      "*": "{actor} sent {object} to {target}",
+      "de-*": "{actor} geschickt {target} das {object}",
+    }
+  }       
+        </artwork></figure>
+        
+        <t>Implementations select an appropriate template to use by matching
+        the Language Ranges provided to the appropriate target language for 
+        which the readable statement is to be generated. If multiple matching
+        Language Ranges are provided, the most specific Range and associated 
+        template is selected.</t>
+        
+        <t>An implementation processing a template would replace each of the 
+        specific replacement tokens with a value adequately representing the 
+        referenced object. Typically, given no additional information about 
+        the object type in question, implementations SHOULD use the value of 
+        the <spanx style="verb">displayName</spanx> property, if present. The
+        specific replacement tokens defined by this version of the specification
+        are:</t>
+      
+        <texttable>
+          <ttcol>Token</ttcol>
+          <ttcol>Description</ttcol>
+          
+          <c>{actor}</c>
+          <c>Replaced with a String value that describes the actor object 
+          specified within the Activity.</c>
+          
+          <c>{object}</c>
+          <c>Replaced with a String value that describes the object specified
+          within the Activity.</c>
+          
+          <c>{target}</c>
+          <c>Replaced with a String value that describes the target specified
+          within the Activity. If a target object is not specified within the
+          activity, the {target} token MUST be ignored and left unreplaced in
+          the final generated String value.</c>
+        </texttable>
+        
+        <t>Implementations are free to introduce additional replacement tokens
+        so long as the label for each is an absolute URI reference. When an 
+        implementation encounters a template that uses a replacement token
+        that it is unable to understand or replace with an appropriate value, 
+        the token SHOULD be ignored and left unreplaced in the final 
+        generated String value.</t>
+        
+        <t>Replacement tokens MUST NOT be processed recursively.</t>
+        
+        <t>The Strings generated by a template MUST be considered to be 
+        plain text and SHOULD NOT contain markup of any kind.</t>
+        
+        <t>If any given verb is known to be a hyponym or synonym of another 
+        verb for which a "verb" object definition is available, implementations 
+        MAY choose to utilize any templates defined within the definitions of 
+        those hypernyms and synonyms.</t>
+
+      </section>
+    
+      <section title="A Complete Example" anchor="example">
+      
+        <figure><preamble>The following illustrates a complete example of 
+        a "verb" object definition:</preamble><artwork>
+  {
+    "objectType": "verb",
+    "displayName": "Send",
+    "id": "http://example.org/verbs/send",
+    "value": "http://example.org/verbs/send",
+    "synonyms": ["http://example.org/verbs/deliver"],
+    "hypernyms": ["give"],
+    "objects": [
+      {
+        "actor": "person",
+        "object": "note",
+        "target": "person",
+        "targetRequired": true,
+        "templates": {
+          "*": "{actor} sent {object} to {target}",
+          "de-*": "{actor} geschickt {target} das {object}",
+        }
+      },
+      {
+        "actor": "person",
+        "object": "note",
+        "templates": {
+          "*": "{actor} sent {object}",
+          "de-*": "{actor} geschickt {object}",
+        }
+      },
+      
+    ]
+  }
+        </artwork></figure>
+      
+      </section>
+
+      <section title="Verb Collections" anchor="verb-collections">
+      
+        <t>Collections of "verb" object definitions can be represented using the 
+        basic Activity Streams Collection serialization defined in Section 3.5 
+        of The JSON Activity Streams specification.</t>
+        
+        <figure><preamble>For example:</preamble><artwork>
+  {
+    "totalItems": 2,
+    "items": [
+      {"objectType": "verb", ...},
+      {"objectType": "verb", ...}
+    ]
+  }
+        </artwork></figure>
+        
+        <t>When an individual "verb" object is considered to be part of 
+        a larger collection of verbs, it can include a special extension 
+        property named "$collection" whose value is the absolute IRI of 
+        a JSON document containing the full collection of verbs. This 
+        follows the conventions and requirements specified by the 
+        <xref target="links">Links for Activity Streams specification.</xref></t>
+        
+        <t>Likewise, the special extension property "$self" can be used to
+        specify the absolute IRI of a JSON document containing only the verb 
+        definition.</t>
+        
+        <figure><preamble>For example:</preamble><artwork>
+  {
+    "objectType": "verb",
+    "$collection": "http://example.org/verbs/all",
+    "$self": "http://example.org/verbs/send",
+    "displayName": "Send",
+    "id": "http://example.org/verbs/send",
+    "value": "http://example.org/verbs/send",
+    "synonyms": ["http://example.org/verbs/deliver"],
+    "hypernyms": ["give"],
+    "objects": [ ... ]
+  }
+        </artwork></figure>
+      
+      </section>
+    
+    </section>
+    
+    <section title="Security Considerations">
+      <t>There are no additional security considerations introduced by this
+      specification.</t>     
+    </section>
+
+    <section title="License">
+    
+      <t>This Specification is made available under the Open Web 
+      Foundation Agreement Version 1.0, which is available at 
+      http://www.openwebfoundation.org/legal/.</t>
+
+      <t>You can review the signed copies of the Open Web Foundation 
+      Agreement Version 1.0 for this Specification at 
+      http://activitystrea.ms/licensing/, which may also include additional 
+      parties to the authors.</t>
+
+      <t>Your use of this Specification may be subject to other third party 
+      rights. THIS SPECIFICATION IS PROVIDED "AS IS." The contributors 
+      expressly disclaim any warranties (express, implied, or otherwise), 
+      including implied warranties of merchantability, non-infringement, 
+      fitness for a particular purpose, or title, related to the Specification. 
+      The entire risk as to implementing or otherwise using the Specification 
+      is assumed by the Specification implementer and user. IN NO EVENT WILL 
+      ANY PARTY BE LIABLE TO ANY OTHER PARTY FOR LOST PROFITS OR ANY FORM OF 
+      INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES OF ANY CHARACTER 
+      FROM ANY CAUSES OF ACTION OF ANY KIND WITH RESPECT TO THIS SPECIFICATION 
+      OR ITS GOVERNING AGREEMENT, WHETHER BASED ON BREACH OF CONTRACT, TORT 
+      (INCLUDING NEGLIGENCE), OR OTHERWISE, AND WHETHER OR NOT THE OTHER PARTY 
+      HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</t>
+    
+    </section>
+
+  </middle>
+
+  <back>
+    <references title="Normative References">
+      &rfc2119;
+      &rfc3987;
+      &rfc3986;
+      &rfc4647;
+      
+      <reference anchor="links">
+        <front>
+          <title>Links for Activity Streams</title>
+          <author fullname="James M Snell" initials="J.M." surname="Snell">
+            <organization>IBM</organization>
+          </author>
+          <date month="April" year="2012" />
+        </front>
+      </reference>
+      
+      <reference anchor="activitystreams">
+        <front>
+          <title>JSON Activity Streams 1.0</title>
+
+    <author fullname="James M Snell" initials="J.M." surname="Snell">
+      <organization>IBM</organization>
+    </author>
+
+    <author fullname="Martin Atkins" initials="M." surname="Atkins">
+      <organization>SAY Media</organization>
+    </author>
+
+    <author fullname="Will Norris" initials="W." surname="Norris">
+      <organization>Google</organization>
+    </author>
+
+    <author fullname="Chris Messina" initials="C." surname="Messina">
+      <organization>Citizen Agency, Google</organization>
+    </author>
+
+    <author fullname="Monica Wilkinson" initials="M." surname="Wilkinson">
+      <organization>MySpace, Facebook, Socialcast</organization>
+    </author>
+
+    <author fullname="Rob Dolin" initials="R." surname="Dolin">
+      <organization>Microsoft</organization>
+    </author>
+
+          <date month="May" year="2011" />
+        </front>
+      </reference>
+      
+    </references>
+  </back>
+</rfc>
