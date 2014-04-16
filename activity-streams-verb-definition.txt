@@ -1,6 +1,5 @@
 
 
-
 Activity Streams Working Group                                  J. Snell
                                                                      IBM
                                                              May 9, 2012
@@ -248,7 +247,7 @@ Snell                                                           [Page 4]
    statements is relatively straightforward.  However, because the
    Activity Streams format allows verbs and objectTypes to be extended
    in a completely decentralized manner, it becomes difficult for
-   implementations to generate appopriate readable descriptions of all
+   implementations to generate appropriate readable descriptions of all
    types of activities.
 
    To address this, "verb" objects can provide a collection of template
